@@ -163,6 +163,10 @@ SpawnActorDeferred를 사용
 		});
 ```
 []는 캡쳐다. this는 this가 캡쳐된다.
+& 모든 변수를 Ref로 캡쳐
+= 모든 변수를 복사하여 캡쳐
+&x, &y, z  : x , y는 Ref 캡쳐, z는 Ref 캡쳐 
+
 
 원래는
 [] () -> returnType {}
