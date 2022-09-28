@@ -137,6 +137,7 @@ GetController()->GetPlayerViewPoint()를 사용한다.
 UKistmetMathLibrary를 사용해 RightVector ForwardVector 등을 계산함.
 
 ### Deferred Spawn
+
 ```
 ADamageTextActor* damageTextActor = GetWorld()->SpawnActorDeferred<ADamageTextActor>(DamageTextActorClass, GetActorTransform());
 if (damageTextActor)
@@ -173,6 +174,7 @@ TFunctionRef<returnType(const param1, const param2, ...)> LambdaParam;
 ### 언리얼은 template를 사용할 수 있는가?
 
 사용은 가능하다.
+
 ```
 emplate<typename T>
 class TURNBASESTRATEGY_API FGridSystem
@@ -198,6 +200,7 @@ public:
 ...
 };
 ```
+
 제한이 있다.
 .h에 구현까지 해야한다.
 UObject를 담을 수 없다.
