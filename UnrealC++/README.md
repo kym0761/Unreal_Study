@@ -213,7 +213,7 @@ UObject는 자신을 가리키는 포인터가 감지되지 않으면 언리얼�
 template를 사용하려면 순수 C++로만 구성하고, 언리얼 오브젝트는 포함하지 않아야한다
 아니면 걍 UObject로 다 만들던지...
 
-###SmartPointer
+### SmartPointer
 
 스마트 포인터는
 C++의 포인터의 가비지 컬렉션 되지 않아 메모리 누수를 막기 위한 스마트포인터다
@@ -223,9 +223,44 @@ TUniquePtr;
 TSharedPtr;
 TWeakPtr;
 
+### Object Trace
+
+```
+APlayerController* playerController= UGameplayStatics::GetPlayerController(GetWorld(),0);
+	if (!IsValid(playerController))
+	{
+		return;
+	}
+
+	FVector loc;
+	FVector rot;
+	playerController->DeprojectMousePositionToWorld(loc, rot);
+
+	TArray<TEnumAsByte<EObjectTypeQuery>> objects;
+	objects.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn));
+	objects.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_PhysicsBody));
 
 
+	TArray<AActor*> ignores;
+	ignores.Add(this);
 
+	FHitResult hit;
 
+	bool result = UKismetSystemLibrary::LineTraceSingleForObjects(
+		GetWorld(),
+		loc,
+		loc + rot * 10000,
+		objects,
+		true,
+		ignores,
+		//EDrawDebugTrace::None,
+		EDrawDebugTrace::ForDuration,
+		hit,
+		true,
+		FLinearColor::Red,
+		FLinearColor::Blue,
+		5.0f
+	);
+```
 
-
+위의 예시는 화면 마우스 위치의 Actor를 선택하는 방법에 대한 예시다.
