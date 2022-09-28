@@ -1,6 +1,6 @@
 # Unreal_Study/UnrealC++
  
-enum 만들기 예시
+### enum 만들기 예시
 
 ```
 UENUM(BlueprintType)
@@ -13,7 +13,7 @@ enum class EAbilityType : uint8
 };
 ```
 
-struct 만들기 예시
+### struct 만들기 예시
 
 ```
 USTRUCT(BlueprintType)
@@ -54,7 +54,7 @@ struct FAbilityDataStruct : public FTableRowBase
 FTableRowBase는 언리얼 데이터 테이블로 사용하기 위해서 상속받아야함.
 
 
-UMG C++로 만들 때
+### UMG C++로 만들 때
 
 ```
 UCLASS(abstract)
@@ -70,4 +70,30 @@ public:
 ```
 UPROPERTY 안에 Meta를 BindWidget을 선언하면,
 언리얼 에디터에서 같은 이름의 에셋에 자동으로 바인드 된다.
+
+
+### 인터페이스 만들기
+```
+ //Interactive Interface Class Base. Don't Use.
+UINTERFACE(Blueprintable)
+class UInteractive : public UInterface
+{
+	GENERATED_BODY()
+};
+
+//Actual Interactive Interface Class. You must Use This When you Inherit Interface.
+class IInteractive
+{
+	GENERATED_BODY()
+
+public:
+
+	UFUNCTION(BlueprintNativeEvent, Category = "Interactive")
+		void Interact(APawn* InteractCauser);
+
+};
+```
+
+UInterface를 상속한 UInteractive를 만들고
+class IInteractive라는 클래스를 따로 선언하면된다.
 
