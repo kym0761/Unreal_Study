@@ -2,6 +2,7 @@
  
 enum 만들기 예시
 
+```
 UENUM(BlueprintType)
 enum class EAbilityType : uint8
 {
@@ -10,9 +11,11 @@ enum class EAbilityType : uint8
 	Debuff UMETA(DisplayName = "Debuff")
 
 };
+```
 
 struct 만들기 예시
 
+```
 USTRUCT(BlueprintType)
 struct FAbilityDataStruct : public FTableRowBase
 {
@@ -46,11 +49,14 @@ struct FAbilityDataStruct : public FTableRowBase
 
 };
 
+```
+
 FTableRowBase는 언리얼 데이터 테이블로 사용하기 위해서 상속받아야함.
 
 
 UMG C++로 만들 때
 
+```
 UCLASS(abstract)
 class PROJECTLIFE_API UConditionIconWidget : public UUserWidget
 {
@@ -61,7 +67,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Meta = (BindWidget))
 		UImage* ConditionImage;
 }
-
+```
 UPROPERTY 안에 Meta를 BindWidget을 선언하면,
 언리얼 에디터에서 같은 이름의 에셋에 자동으로 바인드 된다.
 
