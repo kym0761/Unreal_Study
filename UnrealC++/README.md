@@ -137,7 +137,7 @@ GetController()->GetPlayerViewPoint()를 사용한다.
 UKistmetMathLibrary를 사용해 RightVector ForwardVector 등을 계산함.
 
 ### Deferred Spawn
-````
+```
 ADamageTextActor* damageTextActor = GetWorld()->SpawnActorDeferred<ADamageTextActor>(DamageTextActorClass, GetActorTransform());
 if (damageTextActor)
 {
@@ -150,6 +150,7 @@ SpawnActorDeferred를 사용
 
 ### lambda 사용하기
 
+```
 	hasInteractives.Sort([this](const AActor& a, const AActor& b)
 		{
 			FVector compLocation = this->GetComponentLocation();
@@ -159,7 +160,7 @@ SpawnActorDeferred를 사용
 
 			return distA < distB;
 		});
-
+```
 []는 캡쳐다. this는 this가 캡쳐된다.
 
 원래는
