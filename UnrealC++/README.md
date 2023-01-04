@@ -211,11 +211,11 @@ UObject를 담을 수 없다.
 
 UObject는 자신을 가리키는 포인터가 감지되지 않으면 언리얼엔진에서 가비지 컬렉팅을 한다.
 근데, template는 UCLASS()로 만들 수가 없으므로, UObject*로 묶어놔도 언리얼 엔진에서 인식을 못한다.
-위의 예시대로 TArray<UObject*>로 가비지 컬렉션되지 않게 방지하려는 의도로 사용한다고 해도
-결국 가비지 컬렉팅이 되기 때문에, UObject를 섞어서 사용할 수는 없다
+위의 예시대로 TArray<>로 Object*를 가비지 컬렉션되지 않게 방지하려는 의도로 사용한다고 해도
+template class 안에 있는 TArray가 감지되지 않아 결국 가비지 컬렉팅이 되기 때문에, UObject를 섞어서 사용할 수는 없다.
 
 template를 사용하려면 순수 C++로만 구성하고, 언리얼 오브젝트는 포함하지 않아야한다.
-아래에 있는 Smart Pointer를 사용하던지, 아니면 걍 UObject로 다 만들던지...
+아니면 걍 UObject로 다 만들던지...
 
 ### Smart Pointer
 
@@ -230,11 +230,10 @@ TWeakPtr;
 
 보통은 TSharedPtr, TWeakPtr을 사용하게 될 것이다.
 
-원래 UObject는 위의 스마트포인터를 묶을 수가 없고, 묶을 이유가 없긴 했는데
-에픽 게임즈에서 TObjectPtr을 만들었다.
+원래 UObject는 위의 스마트포인터를 묶을 수가 없고, 묶을 이유가 없긴 했는데 에픽 게임즈에서 TObjectPtr을 만들었다.
 
 실질적으로 UObject*를 TObjectPtr<UObject>로 고쳐서 로직이 돌아가고 있기 때문에, 둘중 아무거나 써도 상관없는 것 같다.
-마단 언제든 UObject에 대한 순수 포인터를 막을지도 모르니 이후에 TObjectPtr<T>로 고칠 필요가 있음.
+다만, 언제든 UObject에 대한 순수 포인터를 막을지도 모르니 이후에 TObjectPtr<T>로 고칠 필요가 있음.
 UFUNCTION은 5.1 기준으로는 아직 TObjectPtr을 매개변수로 받을 수 없다.
 
 ~~~
