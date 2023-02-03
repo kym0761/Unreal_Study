@@ -87,6 +87,18 @@ pawn 기본 세팅이 auto Possess ai가 'placed in world'로 되어 있어서 S
 ai에게 possess가 안되어 있다면 movement와 gravity 등이 제대로 동작 안하기 때문에
 pawn 만든 뒤에 auto possess ai를 'placed in world or Spawned'로 고친다.
 
+### 언리얼 프로젝트 이름 바꾸기
+
+ 언리얼 프로젝트 이름을 바꾸려면 uproject 파일 뿐만 아니라 Config의 내용과 C++ 소스의 [ProjectName]_API도 다 바꿔줘야한다.
+ 이후, 언리얼 프로젝트 컨텐츠에 있는 모든 리다이렉트가 고장난다.
+ 예시를 들어보자면, ProjectA라고 명칭을 지어놨던 프로젝트를 ProjectABC로 바꾼다는 가정이다.
+ 위의 방식대로 소스코드 및 uproject, config를 수정할 명칭에 맞게 고쳤을 때, 컨텐츠에 있는 대부분의 블루프린트가 Invalid Class가 된다.
+ 이는 블루프린트 안에 /Script/[ProjectName] 으로 리다이렉팅이 되어 있기 때문이다.
+ 예를 들자면, /Script/ProjectA인 블루프린트는 위의 소스 코드 등을 고쳐도 이 모든 것이 그대로 되어 있다.
+ 이는 Config에서 DefaultEngine.ini의 [/Script/Engine.Engine]에서 +ActiveGameNameRedirects=(OldGameName="/Script/[과거명칭]",NewGameName="/Script/[현재명칭]")을 추가하면 리다이렉트를 다시 고칠 수 있다.
+ 일단 Invalid Class 문제가 해결된 뒤에, 만약 위의 ini의 코드를 지우고도 올바르게 동작하게 하고 싶다면 문제의 소지가 있을 블루프린트들을 다시 저장 및 컴파일을 해주어 리다이렉트가 올바르게 고쳐질 필요가 있음을 명심해야한다.
+
+
 ### 기타
 
 필요하게 된다면 추가할 예정
