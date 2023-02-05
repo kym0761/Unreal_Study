@@ -294,3 +294,64 @@ APlayerController* playerController= UGameplayStatics::GetPlayerController(GetWo
 ```
 
 위의 예시는 화면 마우스 위치의 Actor를 선택하는 방법에 대한 예시다.
+
+### private 변수 에디터에 Expose하기
+
+```
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Ability", Meta = (AllowPrivateAccess = "true"))
+		float CurrentDurationTime;
+```		
+
+### UFUNCTION 함수 override
+
+```
+	UFUNCTION(BlueprintNativeEvent)
+	void EndAbility();
+	virtual void EndAbility_Implementation();
+```
+
+Specifier는 BlueprintImplementableEvent나 BlueprintNativeEvent를 넣으면 된다. virtual void [FuncName]_Implementation(); 을 하면 C++에서도 override가 가능하다.
+
+### ActorComponent를 블루프린트에서 추가하기
+
+```
+UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+class PROJECTLIFE_API UAbilityComponent : public UActorComponent
+{...}
+```
+UCLASS()에 위의 내용을 넣어주면 에디터에서도 추가를 할 수 있다.
+
+
+### UMG 블루프린트를 C++과 연동하기.
+
+```
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Meta = (BindWidget))
+		UHorizontalBox* ConditionBox;
+```
+
+ Meta = (BindWidget)를 Specifier로 추가한 뒤, UMG 블루프린트에서 해당 변수와 같은 위젯을 세팅한다. 위의 예시대로면 HorizontalBox를 추가하고 이름을 ConditionBox로 짓는다.
+ 
+ void NativeConstruct()에서도 추가하는 방법이 있는데, 개인적으론 위 방법을 선호한다.
+ ```
+ void USpawnSlotBase::NativeConstruct()
+{
+	Super::NativeConstruct();
+
+	ImageBorder = Cast<UBorder>(GetWidgetFromName(TEXT("ImageBorder")));
+}
+```
+
+### Timer 예시
+
+```
+h:
+FTimerHandle TraceTimer;
+
+cpp:
+void AUnitSelectPawn::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	GetWorldTimerManager().SetTimer(TraceTimer, this, &AUnitSelectPawn::UnitLook, 0.12f, true); //0.12f는 Interval Time, true는 Loop인지 아닌지를 결정.
+}
+```
