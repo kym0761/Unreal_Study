@@ -355,3 +355,14 @@ void AUnitSelectPawn::BeginPlay()
 	GetWorldTimerManager().SetTimer(TraceTimer, this, &AUnitSelectPawn::UnitLook, 0.12f, true); //0.12f는 Interval Time, true는 Loop인지 아닌지를 결정.
 }
 ```
+
+### UMG C++로 생성하기.
+	h:
+		UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Component")
+		TSubclassOf<UActionSelectButtonWidget> ChooseActionButtonWidgetClass;
+
+	cpp:
+	UActionSelectButtonWidget* buttonWidget = CreateWidget<UActionSelectButtonWidget>(GetWorld(), ChooseActionButtonWidgetClass);
+	buttonWidget->AddToViewport();
+	
+외형을 블루프린트에서 생성할 것이므로, h에서 외형을 연결해야한다.
