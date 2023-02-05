@@ -68,9 +68,33 @@ public:
 		UImage* ConditionImage;
 }
 ```
-UPROPERTY 안에 Meta를 BindWidget을 선언하면,
-언리얼 에디터에서 같은 이름의 에셋에 자동으로 바인드 된다.
 
+ Meta = (BindWidget)를 Specifier로 추가한 뒤, UMG 블루프린트에서 해당 변수와 같은 위젯을 세팅한다.
+ 위의 예시대로면 Image 추가하고 이름을 ConditionImage 지으면 연동된다.
+ 
+ void NativeConstruct()에서도 추가하는 방법이 있는데, 개인적으론 위 방법을 선호한다.
+ ```
+
+void USpawnSlotBase::NativeConstruct()
+{
+	Super::NativeConstruct();
+
+	ImageBorder = Cast<UBorder>(GetWidgetFromName(TEXT("ImageBorder")));
+}
+
+```
+
+
+### UMG C++로 생성하기.
+	h:
+		UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Component")
+		TSubclassOf<UActionSelectButtonWidget> ChooseActionButtonWidgetClass;
+
+	cpp:
+	UActionSelectButtonWidget* buttonWidget = CreateWidget<UActionSelectButtonWidget>(GetWorld(), ChooseActionButtonWidgetClass);
+	buttonWidget->AddToViewport();
+	
+외형을 블루프린트에서 생성할 것이므로, h에서 외형을 연결해야한다.
 
 ### 인터페이스 만들기
 ```
@@ -321,26 +345,6 @@ class PROJECTLIFE_API UAbilityComponent : public UActorComponent
 ```
 UCLASS()에 위의 내용을 넣어주면 에디터에서도 추가를 할 수 있다.
 
-
-### UMG 블루프린트를 C++과 연동하기.
-
-```
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Meta = (BindWidget))
-		UHorizontalBox* ConditionBox;
-```
-
- Meta = (BindWidget)를 Specifier로 추가한 뒤, UMG 블루프린트에서 해당 변수와 같은 위젯을 세팅한다. 위의 예시대로면 HorizontalBox를 추가하고 이름을 ConditionBox로 짓는다.
- 
- void NativeConstruct()에서도 추가하는 방법이 있는데, 개인적으론 위 방법을 선호한다.
- ```
- void USpawnSlotBase::NativeConstruct()
-{
-	Super::NativeConstruct();
-
-	ImageBorder = Cast<UBorder>(GetWidgetFromName(TEXT("ImageBorder")));
-}
-```
-
 ### Timer 예시
 
 ```
@@ -363,18 +367,6 @@ void AUnitSelectPawn::BeginPlay()
 	FTimerDelegate funcDelegate = FTimerDelegate::CreateUObject(this, &USoldierStatComponent::PoisonDamage, PoisonCauser, PoisonInstigator);
 	GetWorld()->GetTimerManager().SetTimer(PoisonTimer, funcDelegate, 1.0f, true, 0.0f);
 ```
-
-
-### UMG C++로 생성하기.
-	h:
-		UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Component")
-		TSubclassOf<UActionSelectButtonWidget> ChooseActionButtonWidgetClass;
-
-	cpp:
-	UActionSelectButtonWidget* buttonWidget = CreateWidget<UActionSelectButtonWidget>(GetWorld(), ChooseActionButtonWidgetClass);
-	buttonWidget->AddToViewport();
-	
-외형을 블루프린트에서 생성할 것이므로, h에서 외형을 연결해야한다.
 
 ### Blueprint Library 만들기 예시
 
@@ -519,8 +511,10 @@ void APuzzleDoor::TimelineFloatFunction(float Value)
 
 ### 현재 overlapping 중인 Actor들을 찾기
 
+```
 TArray<AActor*> overlapActors;
 FireOverlap->GetOverlappingActors(overlapActors); // FireOverlap은 UBoxComponent다.
+```
 
 ### 인벤토리 DragDrop 구현
 
@@ -551,7 +545,7 @@ NativeOnDragDetected에서는 DragDisplay와 DragDropOperation을 만들어줘�
 	dragDropOper->Pivot = EDragPivot::CenterCenter;
 ```
 
-NativeOnDrop에서는 UDragDropOperation* InOperation에서  InOperation->Payload로 위의 DragDisplay에 사용된 Widget을 Casting하여 기능을 만든다.
+NativeOnDrop에서는 UDragDropOperation* InOperation에서  InOperation->Payload를 위의 DragDisplay에 사용된 Widget으로 Casting하여 기능을 만든다.
 
 ```
 			UItemSlot* droppedItemSlot = Cast<UItemSlot>(InOperation->Payload);
