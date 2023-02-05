@@ -425,6 +425,8 @@ return이 &이면 위처럼 만든다.
 
 ### 맞은 부위에 따라 다른 데미지를 주기 만들기
 
+```
+
 void USoldierStatComponent::AddDamage(float Damage, const FHitResult& Hit)
 {
 	FName hitBoneName = Hit.BoneName;
@@ -457,8 +459,10 @@ void USoldierStatComponent::AddDamage(float Damage, const FHitResult& Hit)
 
 }
 
+```
 ### DataTable에 접근에 데이터 받아오기
 
+```
 			//Find Data from RowName;
 			FSoldierRankTable* rowTable = soldierRankDataTable->FindRow<FSoldierRankTable>(rowName, TEXT(""));
 			if (rowTable)
@@ -467,8 +471,11 @@ void USoldierStatComponent::AddDamage(float Damage, const FHitResult& Hit)
 				RankName = rowTable->Rank;
 				ExpToNeed = rowTable->Exp;
 			}
+```
 
 ### C++에서 Timeline 사용하기
+
+```
 
 void APuzzleDoor::InitializeForTimeline()
 {
@@ -507,3 +514,5 @@ void APuzzleDoor::TimelineFloatFunction(float Value)
 	FVector doorMeshLocation = FVector(0.0f,0.0f,Value);
 	Mesh->SetRelativeLocation(doorMeshLocation);
 }
+
+```
