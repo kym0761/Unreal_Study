@@ -356,6 +356,15 @@ void AUnitSelectPawn::BeginPlay()
 }
 ```
 
+만약 타이머에 사용할 Function이 Parameter를 받는다면 FTimerDelegate::CreateUObject를 이용하면 된다.
+
+```
+	//Function for Damage caused by Poison.
+	FTimerDelegate funcDelegate = FTimerDelegate::CreateUObject(this, &USoldierStatComponent::PoisonDamage, PoisonCauser, PoisonInstigator);
+	GetWorld()->GetTimerManager().SetTimer(PoisonTimer, funcDelegate, 1.0f, true, 0.0f);
+```
+
+
 ### UMG C++로 생성하기.
 	h:
 		UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Component")
@@ -366,3 +375,135 @@ void AUnitSelectPawn::BeginPlay()
 	buttonWidget->AddToViewport();
 	
 외형을 블루프린트에서 생성할 것이므로, h에서 외형을 연결해야한다.
+
+### Blueprint Library 만들기 예시
+
+UCLASS()
+class PROJECTLIFE_API UGameTimeFunctionLibrary : public UBlueprintFunctionLibrary
+{
+	GENERATED_BODY()
+
+public:
+
+	UFUNCTION(BlueprintPure, meta = (DisplayName = "GameTime + GameTime", 
+		CompactNodeTitle = "+", KeyWords = "+ Plus", CommutativeAssosiativeBinaryOperator = "true"), 
+		Category = "GameTime|Convert")
+		static FInGameTime Plus_GameTimeGameTime(FInGameTime InValue1, FInGameTime InValue2);
+
+	UFUNCTION(BlueprintPure, meta = (DisplayName = "ToString (GameTime)",
+		CompactNodeTitle = "->", BlueprintAutocast),
+		Category = "GameTime|Convert")
+		static FString Conv_GameTimeToString(FInGameTime InGameTime);
+
+	UFUNCTION(BlueprintPure, Category = "GameTime|Get")
+		static int32 GetYear_GameTime(FInGameTime InGameTime);
+	...
+};
+
+### operator overloading
+
+```
+	FInGameTime operator+(const FInGameTime& rValue);
+	FInGameTime& operator+=(const FInGameTime& rValue);
+
+	FInGameTime operator-(const FInGameTime& rValue);
+	FInGameTime& operator-=(const FInGameTime& rValue);
+```
+
+parameter로 const와 &를 붙이는 것이 중요하다.
+
+```
+FInGameTime& FInGameTime::operator-=(const FInGameTime& rValue)
+{
+	*this = *this - rValue;
+
+	return *this;
+}
+```
+
+return이 &이면 위처럼 만든다.
+
+### 맞은 부위에 따라 다른 데미지를 주기 만들기
+
+void USoldierStatComponent::AddDamage(float Damage, const FHitResult& Hit)
+{
+	FName hitBoneName = Hit.BoneName;
+
+	//Will Multiply for real Damage
+	float damageVariation = 1.0f;
+
+	//Available Bone Name is in the Skeletal's Physics Asset.
+	if (hitBoneName == "head")
+	{
+		damageVariation = 2.0f;
+	}
+	else if (hitBoneName == "pelvis" || hitBoneName == "spine_01" || hitBoneName == "spine_02" || hitBoneName == "neck_01")
+	{
+		damageVariation = 1.0f;
+	}
+	else if (hitBoneName == "upperarm_r" || hitBoneName == "lowerarm_r" || hitBoneName == "hand_r")
+	{
+		damageVariation = 0.75f;
+	}
+		....
+		....
+
+	HP = FMath::Clamp<float>(HP - Damage * damageVariation, 0.0f, MaxHP);
+
+	if (HP <= 0.0f) // when hp is 0. then Character will die.
+	{
+		bIsDied = true;
+	}
+
+}
+
+### DataTable에 접근에 데이터 받아오기
+
+			//Find Data from RowName;
+			FSoldierRankTable* rowTable = soldierRankDataTable->FindRow<FSoldierRankTable>(rowName, TEXT(""));
+			if (rowTable)
+			{
+				//UE_LOG(LogTemp, Log, TEXT("%s --- %d"), *rowTable->Rank, rowTable->Exp);
+				RankName = rowTable->Rank;
+				ExpToNeed = rowTable->Exp;
+			}
+
+### C++에서 Timeline 사용하기
+
+void APuzzleDoor::InitializeForTimeline()
+{
+	if (CurveForTimeline)
+	{
+		FOnTimelineFloat timelineFloat;
+		timelineFloat.BindDynamic(this, &APuzzleDoor::TimelineFloatFunction); //중요
+
+		TimelineHandle.AddInterpFloat(CurveForTimeline, timelineFloat);
+		TimelineHandle.SetLooping(false);
+	}
+}
+
+void APuzzleDoor::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	//Timeline Need this.
+	TimelineHandle.TickTimeline(DeltaTime);
+
+	//If there is CountDown.. Use This Function.
+	if (bDoorOpen && bUseTimer)
+	{
+		CurrentTime = FMath::Clamp<float>(CurrentTime - DeltaTime, 0.0f, TriggerWaitTime);
+		
+		if (CurrentTime <= 0.0f && bBoxOverlapping == false)
+		{
+			CloseDoor();
+		}
+	}
+
+}
+
+void APuzzleDoor::TimelineFloatFunction(float Value)
+{
+	FVector doorMeshLocation = FVector(0.0f,0.0f,Value);
+	Mesh->SetRelativeLocation(doorMeshLocation);
+}
