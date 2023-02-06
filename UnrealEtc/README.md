@@ -106,6 +106,15 @@ pawn 만든 뒤에 auto possess ai를 'placed in world or Spawned'로 고친다.
 일단 Invalid Class 문제가 해결된 뒤에, 만약 위의 ini의 코드를 지우고도 올바르게 동작하게 하고 싶다면 문제의 소지가 있을 블루프린트들을 다시 저장 및 컴파일을 해주어 리다이렉트가 올바르게 고쳐질 필요가 있음을 명심해야한다.
 ~~~
 
+### 언리얼 C++ 플러그인을 C++을 사용할 수 없는 환경에서 동작하게 만들기.
+
+```
+언리얼 프로젝트로 플러그인을 빌드한다.
+플러그인 빌드된 것을 통째로 C:\Program Files\Epic Games\[언리얼 버전]\Engine\Plugins 에 넣는다.
+해당 플러그인의 Binaries Win64에 들어가서 UnrealEditor.Module의 BuildId를 플러그인 폴더에 있는 MarketPlace의 BuildId로 대체한다.
+```
+
+
 ### 기타
 
 필요하게 된다면 추가할 예정

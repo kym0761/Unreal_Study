@@ -186,18 +186,20 @@ SpawnActorDeferred를 사용
 			return distA < distB;
 		});
 ```
+
 []는 캡쳐다. this는 this가 캡쳐된다.
+
 & 모든 변수를 Ref로 캡쳐
+
 = 모든 변수를 복사하여 캡쳐
+
 &x, &y, z  : x , y는 Ref 캡쳐, z는 Ref 캡쳐 
 
 
-원래는
-[] () -> returnType {}
-이다.
+원래는"[] () -> returnType {}"이다. 예시) [] (const FString& a) -> bool{return true;}
 
 TFunctionRef<>사용하면 Parameter로 람다 함수를 넣을 수 있다.
-TFunctionRef<returnType(const param1, const param2, ...)> LambdaParam;
+ 예시)TFunctionRef<returnType(const param1, const param2, ...)> LambdaParam;
 
 ### 언리얼은 template를 사용할 수 있는가?
 
@@ -229,23 +231,25 @@ public:
 };
 ```
 
-제한이 있다.
-.h에 구현까지 해야한다.
+```
+제한이 있다. 
+.h에 구현까지 해야한다.(cpp에 구현시 오류난다.) 
 UObject를 담을 수 없다.
 
 UObject는 자신을 가리키는 포인터가 감지되지 않으면 언리얼엔진에서 가비지 컬렉팅을 한다.
-근데, template는 UCLASS()로 만들 수가 없으므로, UObject*로 묶어놔도 언리얼 엔진에서 인식을 못한다.
-위의 예시대로 TArray<>로 Object*를 가비지 컬렉션되지 않게 방지하려는 의도로 사용한다고 해도
-template class 안에 있는 TArray가 감지되지 않아 결국 가비지 컬렉팅이 되기 때문에, UObject를 섞어서 사용할 수는 없다.
-
+근데, template class는 UCLASS()로 만들 수가 없으므로, UObject*로 묶어놔도 언리얼 엔진에서 인식을 못한다.
+위의 예시대로 TArray<Object*>로 Object*를 가비지 컬렉션되지 않게 방지하려는 의도로 사용한다고 해도
+template class 안에 있는 TArray가 언리얼 가비지 컬렉션에 정상적으로 감지되지 않아
+결국 가비지 컬렉팅이 되기 때문에, template 클래스 안에서 UObject를 섞어서 사용할 수는 없다.
+```
 template를 사용하려면 순수 C++로만 구성하고, 언리얼 오브젝트는 포함하지 않아야한다.
-아니면 걍 UObject로 다 만들던지...
+다른 Actor에서 가비지 컬렉션이 되지 않도록 잡아두던가, 아니면 걍 UObject로 다 만들던지...
 
 ### Smart Pointer
 
 스마트 포인터는 C++의 포인터의 가비지 컬렉션 되지 않아 메모리 누수를 막기 위한 포인터 객체다.
 
-Unreal도 있다
+Unreal도 있다.
 ~~~
 TUniquePtr;
 TSharedPtr;
@@ -257,8 +261,10 @@ TWeakPtr;
 원래 UObject는 위의 스마트포인터를 묶을 수가 없고, 묶을 이유가 없긴 했는데 에픽 게임즈에서 TObjectPtr을 만들었다.
 
 실질적으로 UObject*를 TObjectPtr<UObject>로 고쳐서 로직이 돌아가고 있기 때문에, 둘중 아무거나 써도 상관없는 것 같다.
+
 다만, 언제든 UObject에 대한 순수 포인터를 막을지도 모르니 이후에 TObjectPtr<T>로 고칠 필요가 있음.
-UFUNCTION은 5.1 기준으로는 아직 TObjectPtr을 매개변수로 받을 수 없다.
+
+UFUNCTION은 5.1 기준으로는 아직 TObjectPtr을 Parameter로 받을 수 없다.
 
 ~~~
 // @TODO: OBJPTR: Investigate TObjectPtr support for UFunction parameters.
