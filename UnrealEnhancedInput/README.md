@@ -4,6 +4,11 @@
 
 C++은 Engine/Plugins/Enhanced Input 을 참고하여 볼 것.
 
+
+
+C++ 문서 : 
+https://nightails.com/2022/10/16/unreal-engine-enhanced-input-system-in-c/
+
 어차피 비슷한 내용일 것이므로, 이를 참고하여 C++화 하든지 말든지...?
 
 ### Input Action
