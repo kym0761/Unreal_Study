@@ -480,8 +480,13 @@ void USoldierStatComponent::AddDamage(float Damage, const FHitResult& Hit)
 	}
 
 }
-
 ```
+
+hit result에서 BoneName을 찾아 어느 Bone에 맞았는지 확인하고 데미지를 다르게 적용하면 된다.
+
+언리얼 FString, FName은 switch()에 사용할 수 없으니 if else if 등을 써야할 것이다.
+
+
 ### DataTable에 접근에 데이터 받아오기
 
 ```
