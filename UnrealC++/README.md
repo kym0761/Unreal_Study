@@ -561,3 +561,31 @@ NativeOnDrop에서는 UDragDropOperation* InOperation에서  InOperation->Payloa
 			UInventoryComponent* drop_InventoryComponent = droppedItemSlot->InventoryComponentRef;
 ```
 
+### Source Code Path 등록
+
+만약 Source 하위에 프로젝트 이름을 제외한 폴더를 추가로 만들어놨다면 접근 오류가 생긴다.
+
+```
+예시
+
+Source/ProjectA/Base에 BaseCharacter.h와,
+Source/ProjectA/Manager에 BaseManager.h를 존재한다고 가정하자
+
+만약 CPP 파일에 include를 한다면
+#include "Base/BaseCharacter.h" 라고 입력하면 컴파일 오류가 난다.
+
+마찬가지로 처음에 클래스를 생성하면, cpp 파일의 경로가 존재하지 않는다면서 오류가 난다.
+```
+
+이는 .Build.cs에 Source/[YourProjectName]을 '모듈'이라 가정하고 Path를 등록해주어야 오류가 나지 않는다.
+
+PrivateIncludePaths.AddRange(new string[] { "[YourProjectName]" });
+
+```
+예시 해결법
+       PrivateIncludePaths.AddRange(new string[] { "ProjectA" });
+
+를 .Build.cs에 추가한다.
+```
+
+아마 Source 폴더에 다른 폴더를 만들었다면 이와 같은 방식으로 Path를 등록해주면 될 듯 하다.
