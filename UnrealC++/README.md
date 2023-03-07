@@ -600,13 +600,16 @@ NativeOnDrop에서는 UDragDropOperation* InOperation에서  InOperation->Payloa
 Source/ProjectA/Base에 BaseCharacter.h와,
 Source/ProjectA/Manager에 BaseManager.h를 존재한다고 가정하자
 
-만약 CPP 파일에 include를 한다면
+만약 BaseManager의 CPP 파일에 include를 하려는 시도를 한다면
 #include "Base/BaseCharacter.h" 라고 입력하면 컴파일 오류가 난다.
+#include "../Base/BaseCharacter.h"라고 입력해야한다.
 
 마찬가지로 처음에 클래스를 생성하면, cpp 파일의 경로가 존재하지 않는다면서 오류가 난다.
+cpp 파일을 들어가보면 #include "Base/BaseCharacter.h"라고 되어있는게 오류가 난다.
+#include "BaseCharacter.h"로 고쳐야 오류가 나지 않는다.
 ```
 
-이는 .Build.cs에 Source/[YourProjectName]을 '모듈'이라 가정하고 Path를 등록해주어야 오류가 나지 않는다.
+이는 .Build.cs에 Source/[YourProjectName]을  '모듈'이라 가정하고 Path를 등록해주어야 오류가 나지 않는다.
 
 PrivateIncludePaths.AddRange(new string[] { "[YourProjectName]" });
 
