@@ -621,3 +621,43 @@ PrivateIncludePaths.AddRange(new string[] { "[YourProjectName]" });
 ```
 
 아마 Source 폴더에 다른 폴더를 만들었다면 이와 같은 방식으로 Path를 등록해주면 될 듯 하다.
+
+### Heapify
+
+```
+    FORCEINLINE bool operator<(const UPathNode& Other)
+    {
+        return F_Cost < Other.GetFCost();
+    }
+
+     static bool PathFindingPredicated(const UPathNode& A, const UPathNode& B)
+    {
+        return A.GetFCost() < B.GetFCost();
+    }
+```
+
+```
+	TArray<UPathNode*> openList;
+
+//아래 방법 중에 원하는 걸 사용하면 됨.
+
+	openList.Heapify(); // 이거 안됨.
+	
+	openList.Heapify(UPathNode::PathFindingPredicated);
+	
+	openList.Heapify([](const UPathNode& A, const UPathNode& B)
+	{
+		return A.GetFCost() < B.GetFCost();
+	});
+	
+	//!! 이 방법은 더이상 들어가지 않을 때만 정상 동작함.
+	Algo::Heapify(openList, [](UPathNode* A, UPathNode* B)
+		{
+			return A->GetFCost() < B->GetFCost();
+		});
+	//추가할 때마다 HeapSort를 써야함.
+	Algo::HeapSort(PathNodeList, [](UPathNode* A, UPathNode* B)
+		{
+			return A->GetFCost() < B->GetFCost();
+		});
+```
