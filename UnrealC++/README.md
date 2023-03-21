@@ -226,7 +226,7 @@ public:
 	~FGridSystem();
 	FGridSystem(int _X_Length, int _Y_Length, float _CellSize);
 
-	void SetGridSystem(int _X_Length, int _Y_Length, float _CellSize, TSharedPtr<FGridSystem<T>> SharedPtr,
+	FORCELINE void SetGridSystem(int _X_Length, int _Y_Length, float _CellSize, TSharedPtr<FGridSystem<T>> SharedPtr,
 		TFunctionRef<T* (TSharedPtr<FGridSystem<T>>, FGrid)> CreateObjectFunction);
 ...
 };
@@ -245,6 +245,16 @@ template class 안에 있는 TArray가 언리얼 가비지 컬렉션에 정상�
 ```
 template를 사용하려면 순수 C++로만 구성하고, 언리얼 오브젝트는 포함하지 않아야한다.
 다른 Actor에서 가비지 컬렉션이 되지 않도록 잡아두던가, 아니면 걍 UObject로 다 만들던지...
+
+template Function은 UFUNCTION이 아닌 경우엔 사용할 수 있으니 참고할 것.
+```
+	template<typename ObjectClass>
+	FORCELINE void SomeFunction(ObjectClass* ObjectOwner, FMySignature::TMethodPtr<ObjectClass> Func)
+	{
+		//
+	}
+```
+
 
 ### Smart Pointer
 
