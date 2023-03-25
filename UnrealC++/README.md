@@ -201,9 +201,7 @@ SpawnActorDeferred를 사용
 TFunctionRef<>사용하면 Parameter로 람다 함수를 넣을 수 있다.
  예시)TFunctionRef<returnType(const param1, const param2, ...)> LambdaParam;
 
-### 언리얼은 template를 사용할 수 있는가?
-
-사용은 가능하다.
+### 언리얼에서 template
 
 ```
 template<typename T>
@@ -217,7 +215,7 @@ private:
 	float CellSize;
 
 public:
-	// !! UObject 사용이 불가능하다.
+	// !! UObject 사용이 불가능하다. UClass도 아니기 때문에 UPROERTY()를 사용도 할 수 없다.
 	TArray<T*> ObjectArray;
 
 public:
@@ -229,31 +227,52 @@ public:
 	FORCELINE void SetGridSystem(int _X_Length, int _Y_Length, float _CellSize, TSharedPtr<FGridSystem<T>> SharedPtr,
 		TFunctionRef<T* (TSharedPtr<FGridSystem<T>>, FGrid)> CreateObjectFunction);
 ...
+
 };
 ```
 
 ```
-제한이 있다. 
+사용에 제한이 있다. 
 .h에 구현까지 해야한다.(cpp에 구현시 오류난다.) 
-UObject를 담을 수 없다.
+UObject가 될 수 없고, UObject의 Ref가 될 수 없다.
 
-UObject는 자신을 가리키는 포인터가 감지되지 않으면 언리얼엔진에서 가비지 컬렉팅을 한다.
-근데, template class는 UCLASS()로 만들 수가 없으므로, UObject*로 묶어놔도 언리얼 엔진에서 인식을 못한다.
-위의 예시대로 TArray<Object*>로 Object*를 가비지 컬렉션되지 않게 방지하려는 의도로 사용한다고 해도
+UObject는 자신의 존재를 보증하는 Outer가 존재하지 않으면 언리얼엔진에서 가비지 컬렉팅을 한다.
+근데, template class는 UCLASS()로 만들 수가 없으므로, UObject * 로 묶어놔도 언리얼 엔진에서 인식을 못한다.
+위의 예시대로 TArray< Object * >로 Object*를 가비지 컬렉션되지 않게 방지하려는 의도로 사용한다고 해도
 template class 안에 있는 TArray가 언리얼 가비지 컬렉션에 정상적으로 감지되지 않아
 결국 가비지 컬렉팅이 되기 때문에, template 클래스 안에서 UObject를 섞어서 사용할 수는 없다.
 ```
 template를 사용하려면 순수 C++로만 구성하고, 언리얼 오브젝트는 포함하지 않아야한다.
 다른 Actor에서 가비지 컬렉션이 되지 않도록 잡아두던가, 아니면 걍 UObject로 다 만들던지...
 
-template Function은 UFUNCTION이 아닌 경우엔 사용할 수 있으니 참고할 것.
+이런 Pure C++ 클래스는 스마트포인터를 사용해야 안전하다.
+
 ```
+DECLARE_DELEGATE(FMySignature); // void 함수를 받을수 있는 delegate
+...
+...
+
+
 	template<typename ObjectClass>
-	FORCELINE void SomeFunction(ObjectClass* ObjectOwner, FMySignature::TMethodPtr<ObjectClass> Func)
+	FORCEINLINE void SomeFunction(ObjectClass* ObjectOwner, FMySignature::TMethodPtr<ObjectClass> Func)
 	{
-		//
+		// ::TMethodPtr<>을 사용하면 (,&ClassName::FunctionName); 처럼 함수 포인터를 파라미터로 받을 수 있음.
 	}
+
+...
+...
+
+{
+...
+...
+	projectChar->SomeFunction(this, &AFuncTestActor::TestActorFunc);
+...
+...
+}
 ```
+위의 예시처럼 template Function은 UFUNCTION이 아닌 경우엔 사용할 수 있다.
+
+
 
 
 ### Smart Pointer
@@ -339,6 +358,9 @@ APlayerController* playerController= UGameplayStatics::GetPlayerController(GetWo
 ### private 변수 에디터에 Expose하기
 
 ```
+
+private: //protected도 가능함.
+	//Meta = (AllowPrivateAccess = "true")를 추가하면 된다.
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Ability", Meta = (AllowPrivateAccess = "true"))
 		float CurrentDurationTime;
 ```		
@@ -351,7 +373,7 @@ APlayerController* playerController= UGameplayStatics::GetPlayerController(GetWo
 	virtual void EndAbility_Implementation();
 ```
 
-Specifier는 BlueprintImplementableEvent나 BlueprintNativeEvent를 넣으면 된다. virtual void [FuncName]_Implementation(); 을 하면 C++에서도 override가 가능하다.
+Specifier는 BlueprintImplementableEvent나 BlueprintNativeEvent를 넣으면 된다. 기본 함수는 건드리지 말고, void [FuncName]_Implementation();로 C++에서 필요한 Function()을 구현 할 수도 있다. virtual을 붙이면 C++에서도 override가 가능하다.
 
 ### ActorComponent를 블루프린트에서 추가하기
 
@@ -373,7 +395,8 @@ void AUnitSelectPawn::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	GetWorldTimerManager().SetTimer(TraceTimer, this, &AUnitSelectPawn::UnitLook, 0.12f, true); //0.12f는 Interval Time, true는 Loop인지 아닌지를 결정.
+	//0.12f는 Interval Time, true는 Loop할지 안할지를 결정.
+	GetWorldTimerManager().SetTimer(TraceTimer, this, &AUnitSelectPawn::UnitLook, 0.12f, true); 
 }
 ```
 
@@ -424,7 +447,7 @@ parameter로 const와 &를 붙이는 것이 중요하다.
 void SomeFunc(FSomeStruct& a); 가 있다 가정하고
 
 someFunc(FSomeStruct());는 사용이 불가능하다.
-이는 FSomeStruct는 RValue라서 그렇다. RValue는 const라서 값을 변경하는데에 문제가 생긴다.
+이는 FSomeStruct는 RValue라서 그렇다. RValue는 const라서 값을 변경할 수 없다.
 FSomeStruct a로 Parameter를 고치면 사용은 가능하지만 복사 Parameter라서 구조체의 크기가 큰 경우에 비효율적이다.
 
 위의 operator의 경우에는
