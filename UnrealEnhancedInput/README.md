@@ -2,14 +2,12 @@
  
 해당 내용은 Blueprint를 기반으로 설명함.
 
-C++은 Engine/Plugins/Enhanced Input 을 참고하여 볼 것.
+C++ API는 Engine/Plugins/Enhanced Input 을 참고하여 볼 것.
 
-
-
-C++ 문서 : 
+C++ 튜토리얼 문서 : 
 https://nightails.com/2022/10/16/unreal-engine-enhanced-input-system-in-c/
 
-어차피 비슷한 내용일 것이므로, 이를 참고하여 C++화 하든지 말든지...?
+어차피 비슷한 내용일 것이므로, 이를 참고하여 C++로 작성해도 괜찮을지도?
 
 ### Input Action
 
@@ -41,7 +39,7 @@ IM_Move_W의 경우 X값을 Input Action Value의 Y에 들어감.
 IM_Move_S의 경우 X값을 -1을 곱한 뒤, Input Action Value의 Y에 들어감.
 
 참고로, 키보드의 Value는 1개(Scalar)만 나오므로, X Y Z가 있어도 X값만 나옴.
-그러니, 위의 Move_W라는 Input Modifier는 X의 값을 뽑아서 Y에 꽂아야함.
+그러니 위의 Move_W라는 Input Modifier는 X의 값을 뽑아서 Y에 꽂아야함.
 
 ```
 
@@ -61,7 +59,7 @@ Input Action 의 Event 설명
 Trigger - 조종하는 동안 Tick마다 1 or More로 동작.
 Started - 최초 한번. 기존의 Pressed임.
 OnGoing - 계속 동작하는 동안, 예를 들면 마우스 버튼 누른 상태에서 안 놓고 계속.
-Canceled - Trigger가 캔슬됐을 때... 라는데 사실 잘 모르겠음. 아마 UI상에서 버튼 누른 상태로 마우스 호버링 벗어난 뒤에 땠을 때 상황을 표현한 게 아닌가 추정함.
+Canceled - Trigger가 캔슬됐을 때... 아마 UI상에서 버튼 누른 상태로 마우스 호버링 벗어난 뒤에 땠을 때 버튼 클릭 행동이 나지 않는 것을 표현한 게 아닌가 추정함.
 Completed - 끝났을 때, 기존의 Released임.
 
 Action Value - bool, float, Vector2D, Vector3D
