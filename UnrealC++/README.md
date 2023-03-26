@@ -698,14 +698,14 @@ PrivateIncludePaths.AddRange(new string[] { "[YourProjectName]" });
 
 	openList.Heapify(); // 이거 안됨.
 	
-	openList.Heapify(UPathNode::PathFindingPredicated);
+	openList.Heapify(UPathNode::PathFindingPredicated); // 미리 정의된 Predicate를 사용하는 방법
 	
-	openList.Heapify([](const UPathNode& A, const UPathNode& B)
+	openList.Heapify([](const UPathNode& A, const UPathNode& B) //람다로 Predicate를 정의하는 방법
 	{
 		return A.GetFCost() < B.GetFCost();
 	});
 	
-	//!! 이 방법은 더이상 들어가지 않을 때만 정상 동작함.
+	//!! 이 방법을 사용하면 TArray에서 Add할 때 반영이 안된다. 그래서 밑의 HeapSort도 해야함.
 	Algo::Heapify(openList, [](UPathNode* A, UPathNode* B)
 		{
 			return A->GetFCost() < B->GetFCost();
