@@ -670,6 +670,15 @@ PrivateIncludePaths.AddRange(new string[] { "[YourProjectName]" });
 
 ### Heapify
 
+최소힙 or 최대힙을 사용해서 최소/최대 값을 빠르게 얻어낼 수 있다.
+	
+사실 Heap과 PriorityQueue는 같은 기능을 한다.
+	
+근데 언리얼에 PriorityQueue가 없다. 따로 만들어줘야한다.
+	
+근데 Heap을 쓸 수 있다면 Heap으로 대체할 수 있으니 Heap쓰는 방법을 알면 된다.
+	
+	
 ```
     FORCEINLINE bool operator<(const UPathNode& Other)
     {
