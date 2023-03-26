@@ -69,8 +69,9 @@ public:
 }
 ```
 
- Meta = (BindWidget)를 Specifier로 추가한 뒤, UMG 블루프린트에서 해당 변수와 같은 위젯을 세팅한다.
- 위의 예시대로면 Image 추가하고 이름을 ConditionImage 지으면 연동된다.
+ Meta = (BindWidget)를 Specifier로 추가한 뒤, UMG Widget 블루프린트에서 해당 변수와 같은 위젯을 세팅한다.
+ 
+ 위의 예시대로면 Image 위젯을 추가하고 이름을 ConditionImage 지으면 UMG Widget 블루프린트와 연동된다.
  
  void NativeConstruct()에서도 추가하는 방법이 있는데, 개인적으론 위 방법을 선호한다.
  ```
@@ -94,7 +95,9 @@ void USpawnSlotBase::NativeConstruct()
 	UActionSelectButtonWidget* buttonWidget = CreateWidget<UActionSelectButtonWidget>(GetWorld(), ChooseActionButtonWidgetClass);
 	buttonWidget->AddToViewport();
 	
-외형을 블루프린트에서 생성할 것이므로, h에서 외형을 연결해야한다.
+외형을 블루프린트로 만들 것이므로, h에서 외형을 연결하고 CreateWidget에서 사용해야한다.
+
+외형 Widget 블루프린트는 해당 C++ 클래스를 상속받아야한다.
 
 ### 인터페이스 만들기
 ```
@@ -170,7 +173,10 @@ if (damageTextActor)
 	damageTextActor->FinishSpawning(GetActorTransform());
 }
 ```
-SpawnActorDeferred를 사용
+Deferred Spawn은 Spawn 전에 변수가 바뀌거나 Init 등의 처리를 할 시간을 가진 뒤에 Spawn 완료 처리를 위한 지연 Spawn이다.
+
+GetWorld()->SpawnActorDeferred를 사용
+
 초기화가 끝난다면, FinishSpawning을 해야함.
 
 ### lambda 사용하기
@@ -193,10 +199,12 @@ SpawnActorDeferred를 사용
 
 = 모든 변수를 복사하여 캡쳐
 
-&x, &y, z  : x , y는 Ref 캡쳐, z는 Ref 캡쳐 
+&x, &y, z  : x , y는 Ref 캡쳐, z는 복사 캡쳐 
 
 
 원래는"[] () -> returnType {}"이다. 예시) [] (const FString& a) -> bool{return true;}
+
+다만 어차피 return ??;을 하면 컴파일러에서 어떤 타입으로 return하는지 파악하기 때문에 생략해도 된다.
 
 TFunctionRef<>사용하면 Parameter로 람다 함수를 넣을 수 있다.
  예시)TFunctionRef<returnType(const param1, const param2, ...)> LambdaParam;
@@ -215,7 +223,7 @@ private:
 	float CellSize;
 
 public:
-	// !! UObject 사용이 불가능하다. UClass도 아니기 때문에 UPROERTY()를 사용도 할 수 없다.
+	// !! UObject 사용이 불가능하다. UClass도 아니기 때문에 UPROPERTY()를 사용할 수 없다.
 	TArray<T*> ObjectArray;
 
 public:
@@ -232,20 +240,22 @@ public:
 ```
 
 ```
-사용에 제한이 있다. 
+아래와 같은 사용에 제한이 있다.
 .h에 구현까지 해야한다.(cpp에 구현시 오류난다.) 
-UObject가 될 수 없고, UObject의 Ref가 될 수 없다.
+UObject가 될 수 없고, UObject의 Ref할 수도 없다.
 
+설명:
 UObject는 자신의 존재를 보증하는 Outer가 존재하지 않으면 언리얼엔진에서 가비지 컬렉팅을 한다.
 근데, template class는 UCLASS()로 만들 수가 없으므로, UObject * 로 묶어놔도 언리얼 엔진에서 인식을 못한다.
 위의 예시대로 TArray< Object * >로 Object*를 가비지 컬렉션되지 않게 방지하려는 의도로 사용한다고 해도
 template class 안에 있는 TArray가 언리얼 가비지 컬렉션에 정상적으로 감지되지 않아
 결국 가비지 컬렉팅이 되기 때문에, template 클래스 안에서 UObject를 섞어서 사용할 수는 없다.
-```
+
 template를 사용하려면 순수 C++로만 구성하고, 언리얼 오브젝트는 포함하지 않아야한다.
 다른 Actor에서 가비지 컬렉션이 되지 않도록 잡아두던가, 아니면 걍 UObject로 다 만들던지...
 
 이런 Pure C++ 클래스는 스마트포인터를 사용해야 안전하다.
+```
 
 ```
 DECLARE_DELEGATE(FMySignature); // void 함수를 받을수 있는 delegate
@@ -288,7 +298,7 @@ TWeakPtr;
 
 보통은 TSharedPtr, TWeakPtr을 사용하게 될 것이다.
 
-원래 UObject는 위의 스마트포인터를 묶을 수가 없고, 묶을 이유가 없긴 했는데 에픽 게임즈에서 TObjectPtr을 만들었다.
+원래 UObject는 위의 스마트포인터를 묶을 수가 없고, 묶을 이유가 없긴 했는데 에픽게임즈에서 TObjectPtr을 만들었다.
 
 실질적으로 UObject*를 TObjectPtr<UObject>로 고쳐서 로직이 돌아가고 있기 때문에, 둘중 아무거나 써도 상관없는 것 같다.
 
@@ -359,7 +369,8 @@ APlayerController* playerController= UGameplayStatics::GetPlayerController(GetWo
 
 ```
 
-private: //protected도 가능함.
+private: 
+	//protected도 가능함.
 	//Meta = (AllowPrivateAccess = "true")를 추가하면 된다.
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Ability", Meta = (AllowPrivateAccess = "true"))
 		float CurrentDurationTime;
