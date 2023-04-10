@@ -120,6 +120,32 @@ pawn 만든 뒤에 auto possess ai를 'placed in world or Spawned'로 고친다.
 해당 플러그인의 Binaries Win64에 들어가서 UnrealEditor.Module의 BuildId를 플러그인 폴더에 있는 MarketPlace의 BuildId로 대체한다.
 ```
 
+### The execution order of BeginPlay 
+
+Begin Play in Editor
+
+Actor in Level
+Game Mode
+Level
+Game State
+Player Controller
+Player State
+HUD
+Pawn
+
+
+
+Begin Play in Built Game
+:
+Pawn
+Game Mode
+Game State
+Player State
+Player Controller
+HUD
+Level
+Actor in Level
+
 
 ### 기타
 
