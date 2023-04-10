@@ -153,60 +153,18 @@ void FThreadTest::GetData(int32& A)
 ```
 header
  	//스마트 포인터를 사용하면 개발자가 delete 처리를 하지 않아도 안전하게 가비지 컬렉션이 된다.
-	TSharedPtr<FBluetoothDataReceiver> DataReceiver;
+	TSharedPtr<FThreadTest> ThreadTest;
 
 
 void ASpawningActor::BeginPlay()
 {
 	Super::BeginPlay();
 
-	ThreadTest = MakeShareable(new FThreadTest);
+	ThreadTest = MakeShareable(new FThreadTest); //스마트 포인터에 바인드
 }
 
 
 ```
-
-
-### 쓰레드 제어 함수를 만들어 사용하면 더 편하다.
-
-```
-    // Thread handling functions
-    void EnsureCompletion();        // Function for killing the thread
-    void PauseThread();             // Function for pausing the thread
-    void ContinueThread();          // Function for continuing/unpausing the thread
-    bool IsThreadPaused();          // Function to check the state of the thread
-
-void FThreadTest::PauseThread()
-{
-	m_pause = true;
-}
-
-void FThreadTest::ContinueThread()
-{
-	m_pause = false;
-
-}
-
-bool FThreadTest::IsThreadPaused()
-{
-	return (bool)m_pause; //     FThreadSafeBool 라서 (bool)을 써서 캐스팅하고 return 해주어야함.
-}
-
-void FThreadTest::EnsureCompletion()
-{
-    UE_LOG(LogTemp, Warning, TEXT("EnsureCompletion"));
-
-	Stop(); //Stop이 호출되면서     m_kill = true;    m_pause = true;이 되어 Run()이 while()을 그만둔다.
-
-	if (Thread.IsValid())
-	{
-		Thread->WaitForCompletion();
-	}
-}
-
-
-```
-
 
 ### 호출 순서
 ```
