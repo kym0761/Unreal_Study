@@ -116,6 +116,34 @@ void FThreadTest::Exit()
 ### mutex를 만들고, 데이터를 안전하게 읽고 쓰게 해준다.
 
 ```
+void FThreadTest::SetData()
+{
+	if (m_mutex.TryLock())
+	{
+		a += 1;
+
+		FPlatformProcess::Sleep(Time); //테스트 용도로 mutex를 받은 상태서 잠시 멈추어 충돌이 나게 만듬.
+		m_mutex.Unlock();
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("SetData Failed cause of mutex"));
+	}
+}
+
+void FThreadTest::GetData(int32& A)
+{
+	if (m_mutex.TryLock())
+	{
+		A = a;
+		m_mutex.Unlock();
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("GetData Failed cause of mutex"));
+	}
+
+}
 
 
 ```
