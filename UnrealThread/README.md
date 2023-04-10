@@ -3,43 +3,61 @@
 ### FRunnable 클래스를 상속받아 새로운 클래스를 만든다.
 
 ```
-class BLUETOOTHWINDOWSPLUGIN_API FBluetoothDataReceiver : public FRunnable
+class OBJECTTEST_API FThreadTest : public FRunnable
 {
-}
+public:
+	FThreadTest();
+
+ //소멸자는 virtual로 만들면 좋다. virtual을 쓰지 않으면 부모 클래스의 소멸자가 호출되서 제대로 된 데이터 회수가 일어나지 않는다.
+	virtual ~FThreadTest();
+
+protected:
+
+    int32 a = 0;
+    float Time;
+    TSharedPtr<FRunnableThread> Thread;
+
+    FCriticalSection m_mutex;
+    FThreadSafeBool m_kill;
+    FThreadSafeBool m_pause;
+
+    // FRunnable interface functions
+    virtual bool Init() override;
+    virtual uint32 Run() override;
+    virtual void Stop() override;
+    virtual void Exit() override;
+
+    void SetData();
+
+public:
+
+    void GetData(int32& A);
+};
+
 ```
 
-### 생성자 / 소멸자를 만든다.
+### 생성자 / 소멸자
 
 ```
-	FBluetoothDataReceiver();
-	virtual ~FBluetoothDataReceiver(); //소멸자는 virtual로 만들면 좋다. virtual을 쓰지 않으면 부모 클래스의 소멸자가 호출되서 제대로 된 데이터 회수가 일어나지 않는다.
-
-//생성자
-FBluetoothDataReceiver::FBluetoothDataReceiver()
+FThreadTest::FThreadTest()
 {
-    UE_LOG(LogTemp, Warning, TEXT("FBluetoothDataReceiver"));
+	UE_LOG(LogTemp, Warning, TEXT("Thread::Constructor()"));
 
+	Thread = MakeShareable(FRunnableThread::Create(this, TEXT("Thread Name"), 0, TPri_BelowNormal));
 	m_kill = false;
 	m_pause = false;
 
-	//// Create the worker thread
-    Thread = MakeShareable(FRunnableThread::Create(this, TEXT("Cadence Thread"), 0, TPri_BelowNormal));
-
+	Time = 1.0f;
 }
 
-//소멸자
-FBluetoothDataReceiver::~FBluetoothDataReceiver()
+
+FThreadTest::~FThreadTest()
 {
-    UE_LOG(LogTemp, Warning, TEXT("~FBluetoothDataReceiver"));
-
-
-
+	UE_LOG(LogTemp, Warning, TEXT("Thread::Destructor()"));
 	if (Thread.IsValid())
 	{
-
-		// Clean up the worker thread
-        Thread->Kill();
-
+		// Kill을 하지 않아도 스마트 포인터로 묶인 FThreadTest가 가비지 컬렉션 되면서 쓰레드도 같이 가비지 컬렉션이 발동해 시간이 지나면 Stop이 불려서 로직이 종료는 된다. 다만 종료시 랙이 발생하니 Kill해서 빠르게 처리한다.
+		Thread->Kill();
 	}
 }
 
@@ -48,77 +66,56 @@ FBluetoothDataReceiver::~FBluetoothDataReceiver()
 ### 기본 FRunnable의 Interface 함수를 구현한다.
 
 ```
-    virtual bool Init() override;
-    virtual uint32 Run() override;
-    virtual void Stop() override;
-    virtual void Exit() override;
 
-    FThreadSafeBool m_kill;
-    FThreadSafeBool m_pause;
 
-bool FBluetoothDataReceiver::Init()
+bool FThreadTest::Init()
 {
-    UE_LOG(LogTemp, Warning, TEXT("FBluetoothDataReceiver::Init()"));
+	UE_LOG(LogTemp, Warning, TEXT("Thread::Init()"));
+
+	//false면 실행이 불가능할 것이다.
 	return true;
 }
 
-void FBluetoothDataReceiver::Stop()
+uint32 FThreadTest::Run()
 {
-    m_kill = true;
-    m_pause = true;
+	UE_LOG(LogTemp, Warning, TEXT("Thread::Run() Begin"));
 
-    UE_LOG(LogTemp, Warning, TEXT("FBluetoothDataReceiver::Stop()"));
+	while (!m_kill) // kill되면 완전히 빠져나갈 수 있음.
+	{
+		while (!m_pause) //pause 상태서는 잠시 이 행동만 멈추고 Run의 첫번째 while은 계속 돌 수 있음.
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Thread::Run() while Loop"));
+			SetData();
+			FPlatformProcess::Sleep(Time); //Run에 쉬는 시간 없이 계속 돌게하면 컴퓨터 터짐
+		}
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("Thread::Run() Ended"));
+
+	return 0;
+}
+
+void FThreadTest::Stop()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Thread::Stop()"));
+
+	m_kill = true;
+	m_pause = true;
 
 }
 
-void FBluetoothDataReceiver::Exit()
+void FThreadTest::Exit()
 {
-    UE_LOG(LogTemp, Warning, TEXT("FBluetoothDataReceiver::Exit()"));
-}
-
-uint32 FBluetoothDataReceiver::Run()
-{
-
-while(!m_pause && !m_kill) // 특별한 일이 없는 이상 Run은 계속 실행된다는 의미다.
-{
+	UE_LOG(LogTemp, Warning, TEXT("Thread::Exit()"));
 
 }
 
-return 0;
-}
 
 ```
 
 ### mutex를 만들고, 데이터를 안전하게 읽고 쓰게 해준다.
 
 ```
-Header
-
-    FCriticalSection m_mutex;
-
-Function A
-
-if (m_mutex.TryLock())
-    {
-        WheelRevolutions = InWheelRevo;
-        WheelEventTimestamp = InWheelTime;
-        CrankRevolutions = InCrankRevo;
-        CrankEventTimestamp = InCrankTime;
-
-        m_mutex.Unlock();
-    }
-
-
-Function B
-    if (m_mutex.TryLock())
-    {
-        WheelRevo = WheelRevolutions;
-        WheelTime = WheelEventTimestamp;
-        CrankRevo = CrankRevolutions;
-        CrankTime = CrankEventTimestamp;
-
-        m_mutex.Unlock();
-    }
 
 
 ```
@@ -131,23 +128,13 @@ header
 	TSharedPtr<FBluetoothDataReceiver> DataReceiver;
 
 
-void ABluetoothDataReader::BeginPlay()
+void ASpawningActor::BeginPlay()
 {
 	Super::BeginPlay();
 
-	DataReceiver = MakeShareable(new FBluetoothDataReceiver()); //스마트 포인터로 만들기
+	ThreadTest = MakeShareable(new FThreadTest);
 }
 
-void ABluetoothDataReader::EndPlay(const EEndPlayReason::Type EndPlayReason)
-{
-	if (DataReceiver.IsValid())
-	{
-		DataReceiver->EnsureCompletion(); //Stop과 Thread 종료를 하는 함수, 아래 참고
-	}
-
-	Super::EndPlay(EndPlayReason);
-
-}
 
 ```
 
@@ -161,23 +148,23 @@ void ABluetoothDataReader::EndPlay(const EEndPlayReason::Type EndPlayReason)
     void ContinueThread();          // Function for continuing/unpausing the thread
     bool IsThreadPaused();          // Function to check the state of the thread
 
-void FBluetoothDataReceiver::PauseThread()
+void FThreadTest::PauseThread()
 {
 	m_pause = true;
 }
 
-void FBluetoothDataReceiver::ContinueThread()
+void FThreadTest::ContinueThread()
 {
 	m_pause = false;
 
 }
 
-bool FBluetoothDataReceiver::IsThreadPaused()
+bool FThreadTest::IsThreadPaused()
 {
 	return (bool)m_pause; //     FThreadSafeBool 라서 (bool)을 써서 캐스팅하고 return 해주어야함.
 }
 
-void FBluetoothDataReceiver::EnsureCompletion()
+void FThreadTest::EnsureCompletion()
 {
     UE_LOG(LogTemp, Warning, TEXT("EnsureCompletion"));
 
@@ -190,6 +177,22 @@ void FBluetoothDataReceiver::EnsureCompletion()
 }
 
 
-
-
 ```
+
+
+### 호출 순서
+```
+Constructor()
+Init() -> false면 일 안함
+Run()
+//////Run이 계속 While에 돈다.
+//////종료 발동시 아래와 같다.
+Destructor()
+Stop()
+/////Run Ended.
+Exit()
+```
+
+만약 Init()이 false라면
+Run()과 Exit()이 동작하지 않는다.
+Destructor() 호출되면 Stop()만 되고 끝난다.
