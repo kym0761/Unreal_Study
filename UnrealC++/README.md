@@ -796,9 +796,6 @@ enum class EBitmaskExample : uint8
 	C
 };
 
-
-```
-
 {
 ...
 ...
@@ -813,9 +810,11 @@ int32 BitmaskFlags;
 ```
 
 1. enum 클래스를 만들고 Meta = (Bitflags) 설정.
-2. uint8 변수를 만들고 URPOPERTY(meta = (BitMask, BitmaskEnum = "[EnumClassName]")) 설정.
+
+2. int32 변수를 만들고 URPOPERTY(meta = (BitMask, BitmaskEnum = "[EnumClassName]")) 설정.
 
 이렇게 만들면 에디터에서 Bitmask로 사용할 수 있다.
+
 BitmaskFlags의 값이 int32이므로 bitmask로 최대 32개까지만 사용할 수 있을 것이다.
 
 ### Object Type & Collision Profile
@@ -824,3 +823,10 @@ DefaultEngine.ini에 들어가면
 사용자가 추가한 Object Type이나 Collision Profile의 ECC_GameTraceChannel[번호] 등은 알 수 있음.
 
 Object Type을 추가했다면, 필요한 액터에 Object Type을 변경해야하는 점을 잊지 말아야함.
+
+```
+	TArray<TEnumAsByte<EObjectTypeQuery>> objects;
+
+	objects.Add(UEngineTypes::ConvertToObjectType(
+		ECollisionChannel::ECC_GameTraceChannel2));
+```
