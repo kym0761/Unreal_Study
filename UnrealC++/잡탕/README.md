@@ -1,18 +1,5 @@
 # Unreal_Study/UnrealC++
  
-### enum 만들기 예시
-
-```
-UENUM(BlueprintType)
-enum class EAbilityType : uint8
-{
-	None UMETA(DisplayName = "None"),
-	Buff UMETA(DisplayName = "Buff"),
-	Debuff UMETA(DisplayName = "Debuff")
-
-};
-```
-
 ### struct 만들기 예시
 
 ```
@@ -208,82 +195,6 @@ GetWorld()->SpawnActorDeferred를 사용
 
 TFunctionRef<>사용하면 Parameter로 람다 함수를 넣을 수 있다.
  예시)TFunctionRef<returnType(const param1, const param2, ...)> LambdaParam;
-
-### 언리얼에서 template
-
-```
-template<typename T>
-class TURNBASESTRATEGY_API FGridSystem
-{
-
-private:
-
-	int32 X_Length;
-	int32 Y_Length;
-	float CellSize;
-
-public:
-	// !! UObject 사용이 불가능하다. UClass도 아니기 때문에 UPROPERTY()를 사용할 수 없다.
-	TArray<T*> ObjectArray;
-
-public:
-
-	FGridSystem();
-	~FGridSystem();
-	FGridSystem(int _X_Length, int _Y_Length, float _CellSize);
-
-	FORCELINE void SetGridSystem(int _X_Length, int _Y_Length, float _CellSize, TSharedPtr<FGridSystem<T>> SharedPtr,
-		TFunctionRef<T* (TSharedPtr<FGridSystem<T>>, FGrid)> CreateObjectFunction);
-...
-
-};
-```
-
-```
-아래와 같은 사용에 제한이 있다.
-.h에 구현까지 해야한다.(cpp에 구현시 오류난다.) 
-UObject가 될 수 없고, UObject의 Ref할 수도 없다.
-
-설명:
-UObject는 자신의 존재를 보증하는 Outer가 존재하지 않으면 언리얼엔진에서 가비지 컬렉팅을 한다.
-근데, template class는 UCLASS()로 만들 수가 없으므로, UObject * 로 묶어놔도 언리얼 엔진에서 인식을 못한다.
-위의 예시대로 TArray< Object * >로 Object*를 가비지 컬렉션되지 않게 방지하려는 의도로 사용한다고 해도
-template class 안에 있는 TArray가 언리얼 가비지 컬렉션에 정상적으로 감지되지 않아
-결국 가비지 컬렉팅이 되기 때문에, template 클래스 안에서 UObject를 섞어서 사용할 수는 없다.
-
-template를 사용하려면 순수 C++로만 구성하고, 언리얼 오브젝트는 포함하지 않아야한다.
-다른 Actor에서 가비지 컬렉션이 되지 않도록 잡아두던가, 아니면 걍 UObject로 다 만들던지...
-
-이런 Pure C++ 클래스는 스마트포인터를 사용해야 안전하다.
-```
-
-```
-DECLARE_DELEGATE(FMySignature); // void 함수를 받을수 있는 delegate
-...
-...
-
-
-	template<typename ObjectClass>
-	FORCEINLINE void SomeFunction(ObjectClass* ObjectOwner, FMySignature::TMethodPtr<ObjectClass> Func)
-	{
-		// ::TMethodPtr<>을 사용하면 (,&ClassName::FunctionName); 처럼 함수 포인터를 파라미터로 받을 수 있음.
-	}
-
-...
-...
-
-{
-...
-...
-	projectChar->SomeFunction(this, &AFuncTestActor::TestActorFunc);
-...
-...
-}
-```
-위의 예시처럼 template Function은 UFUNCTION이 아닌 경우엔 사용할 수 있다.
-
-
-
 
 ### Smart Pointer
 
