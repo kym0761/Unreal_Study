@@ -68,13 +68,18 @@ TemplateClass<int32> tc;
 그러므로 UCLASS()를 위에 붙여봤자 클래스로 인식되지 않으므로 UObject로 파생된 클래스를 만들 수가 없다.
 
 
-또한, UCLASS가 아니기 때문에 기본적인 방식으로는 UObject를 참조하는 클래스가 될 수 없어서 언리얼의 가비지 컬렉션으로부터
-포함된 객체를 지켜주지 않는다.
+또한, UCLASS가 아니기 때문에 기본적인 방식으로는 UObject를 참조하는 클래스가 될 수 없어서 언리얼의 가비지 컬렉션으로부터 하위 객체를 지켜주지 않는다.
 
 이 부분을 해결하기 위해서 FGCObject를 상속받은 template 클래스를 만들고
+
 virtual void AddReferencedObjects(FReferenceCollector& Collector) override
+
 virtual FString GetReferencerName() const override
+
 를 위의 예시처럼 구현하면 순수 C++ 클래스에서도 언리얼 가비지 콜렉션으로부터 하위 객체들을 지켜줄 수 있다.
+
+위의 방법은 template class 뿐만 아니라, 다른 순수 C++ 클래스에서도 적용되는 방법임.
+
 
 또한 이런 순수 C++ 클래스들은 스마트포인터를 사용해야 안전하므로 참고하는 것이 좋다.
 
