@@ -105,10 +105,13 @@ UPROPERTY()를 언리얼 오브젝트에 지정하면 nullptr로 자동을 초�
 ### 일반 클래스에서 언리얼 오브젝트를 관리해야할 때
 
 UPROPERTY()를 사용하지 못하는 퓨어 C++ 클래스들이 이에 해당함 (위에 언급된 2번째)
-퓨어 C++ 클래스는 UCLASS()가 아니므로 멤버변수에 UPROPERTY()를 지정해도 가비지 컬렉션을 막을 수 없음.
 
-FGCObject를 상속받은 후에, AddReferencedObjects()를 구현한다.
-또한 FString GetReferencerName() const도 구현해주어야한다.
+순수 C++ 클래스는 UCLASS()가 아니므로 멤버변수에 UPROPERTY()를 지정해도 가비지 컬렉션을 막을 수 없음.
+
+FGCObject를 상속받은 후에, 
+1. void AddReferencedObjects()를 구현한다.
+2. FString GetReferencerName() const 를 구현한다.
 
 함수 구현부에는 관리할 언리얼 오브젝트를 추가해준다.
 
+이 내용은 UnrealC++_Template를 참고하면 좋다.
