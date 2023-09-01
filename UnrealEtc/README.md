@@ -122,16 +122,15 @@ pawn 만든 뒤에 auto possess ai를 'placed in world or Spawned'로 고친다.
 
 ### The execution order of BeginPlay 
 
-Begin Play in Editor
-
-Actor in Level
-Game Mode
-Level
-Game State
-Player Controller
-Player State
-HUD
-Pawn
+Begin Play in Editor 
+Actor in Level 
+Game Mode 
+Level 
+Game State 
+Player Controller 
+Player State 
+HUD 
+Pawn 
 
 
 
