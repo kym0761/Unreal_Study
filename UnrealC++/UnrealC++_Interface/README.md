@@ -37,9 +37,22 @@ public:
 
 인터페이스로 형변환을 했다면, 인터페이스 구현 유무를 파악할 수 있음
 ```
+///이 방법 쓰면 안됨. 5.X? 버전 부터는 Deprecated됨.
 IInteractive* interactive = Cast<IInteractive>(pawn);
 if(interactive)
 {
 interactive->interact(aaa);
+}
+```
+
+```
+TObjectPtr<AActor> hitActor = result.GetActor();
+
+if (IsValid(hitActor) &&
+	hitActor->GetClass()->ImplementsInterface(UInteractive::StaticClass())) //Interface가 Implement됐는지 확인한 뒤
+{
+	IInteractive::Execute_Interact(hitActor, this); //[InterfaceClassName]::Execute_[InterfaceFunctionName]([HasinterfaceClass], args...);으로 실행함.
+	Debug::Print(TEXT("Interact OK."));
+	return true;
 }
 ```
