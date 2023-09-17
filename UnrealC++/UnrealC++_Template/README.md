@@ -138,7 +138,7 @@ TWeakPtr;
 
 다만, 언제든 UObject에 대한 순수 포인터를 막을지도 모르니 이후에 TObjectPtr<T>로 고칠 필요가 있음.
 
-UFUNCTION은 5.1 기준으로는 아직 TObjectPtr을 Parameter로 받을 수 없다.
+UFUNCTION은 5.2 기준으로는 아직 TObjectPtr을 Parameter로 받을 수 없다. (23.09.17 확인.)
 ```
 
 ```
