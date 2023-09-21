@@ -83,7 +83,7 @@ virtual void Func01()
 
 ensureMsg()는 이유는 모르겠지만 5.2버전에서 사용이 불가능했음.
 
-## Debug Log
+## Debugging Log
 
 ### UE_LOG()
 
