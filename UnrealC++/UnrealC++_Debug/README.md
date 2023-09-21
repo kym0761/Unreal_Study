@@ -116,7 +116,7 @@ Verbose
 VeryVerbose
 ```
 
-## AddOnScreenDebugMessage()
+### AddOnScreenDebugMessage()
 
 화면에 로그 띄워줌, 이 디버그 메시지는 GEngine이 있을 때만 사용가능하므로, 사용 전에 GEngine이 존재하는지 확인을 추천함.
 ```
@@ -126,10 +126,10 @@ if (GEngine)
 }
 ```
 
-## 커스텀 디버깅 로그
+### 커스텀 디버깅 로그
 
 위의 UE_LOG(), AddOnScreenDebugMessage()은 어디에서 호출됐는지 확인이 불가능하다.  
-Assert를 사용하면 확인할 수 있지만, Assert는 동작을 멈추는 기능을 포함하고 있으므로 동작을 굳이 멈추지 않아도 될 디버깅 로그까지 Assert를 할 필요는 없다.  
+Assert를 사용하면 확인할 수 있지만, Assert는 동작을 멈추는 크리티컬한 상황에 사용되는 부분이라, 굳이 멈추지 않아도 될 디버깅 로그일 때도 위치를 알면 좋을 것 같다.  
 아래 코드를 사용하면 디버깅 로그에서 함수명과 몇번째 줄에서 호출됐는지 확인 가능함.
 
 ```
