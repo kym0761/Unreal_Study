@@ -95,52 +95,6 @@ void USpawnSlotBase::NativeConstruct()
 
 외형 Widget 블루프린트는 해당 C++ 클래스를 상속받아야한다.
 
-### 인터페이스 만들기
-```
- //Interactive Interface Class Base. Don't Use.
-UINTERFACE(Blueprintable)
-class UInteractive : public UInterface
-{
-	GENERATED_BODY()
-};
-
-//Actual Interactive Interface Class. You must Use This When you Inherit Interface.
-class IInteractive
-{
-	GENERATED_BODY()
-
-public:
-
-	UFUNCTION(BlueprintNativeEvent, Category = "Interactive")
-		void Interact(APawn* InteractCauser);
-
-};
-```
-
-UInterface를 상속한 UInteractive를 만들고
-class IInteractive라는 클래스를 따로 선언하면된다.
-```
-UCLASS()
-class PROJECTLIFE_API ABasicInteractiveActor : public AActor, public IInteractive
-{
-	GENERATED_BODY()
-
-
-	virtual void Interact_Implementation(APawn* InteractCauser);
-};
-```
-위처럼 IInteractive를 상속받은 뒤에 해당 인터페이스의 함수를 구현해줘야함.
-
-
-인터페이스를 사용하다면...
-if (IsValid(interactee) && interactee->GetClass()->ImplementsInterface(UInteractive::StaticClass()))
-{
-IInteractive::Execute_Interact(interactee, this);
-}
-
-지금처럼, ImplementsInterface()를 사용하여 인터페이스가 적용되어 있는지 확인하고
-인터페이스의 Execute_();를 사용한다.
-
 ### 카메라 기준 방향으로 움직이기
 ```
 void ABasicCharacter::MoveRight(float Value)
