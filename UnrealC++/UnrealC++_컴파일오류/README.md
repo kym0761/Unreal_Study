@@ -2,7 +2,7 @@
  
 ## 설명
 
-컴파일 오류 나는 예시 및 해결법을 서술함.
+자주 하는 실수로 인해 나오는 컴파일 오류 예시 및 해결법을 서술함.
 
 
 ### 헤더가 없음
@@ -62,3 +62,43 @@ PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
 ```
 
 3. Build.cs 파일에 위 내용처럼 프로젝트 경로를 연결해준다.
+
+### 구조체를 TMap, TSet에서 사용할 때 오류
+
+개인 사용자가 만든 구조체는 TMap, TSet에 사용하기 위해서는 == 연산자 오버로딩, GetTypeHash() 구현이 필요하다.
+
+```
+USTRUCT(BlueprintType, Blueprintable)
+struct FGrid
+{
+	GENERATED_BODY()
+
+public:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Grid")
+	int32 X;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Grid")
+	int32 Y;
+
+	FGrid();
+	FGrid(int32 _X, int32 _Y);
+	bool operator==(const FGrid& Other) const;
+};
+
+uint32 GetTypeHash(const FGrid& Grid)
+{
+	return FCrc::MemCrc32(&Grid, sizeof(Grid));
+}
+
+```
+근데, 이 구조체로 TMap, TSet에 사용한 내역이 프로젝트에 존재하지 않으면 오류가 난다.
+그러니 만약 이 기능을 사용할 것이라면 꼭 사용해야한다.
+
+### Super::
+
+언리얼 객체의 virtual 함수는 대부분 Super::가 있을 것이다.(모든 virtual함수에 Super::가 있는지는 모름)
+예시) BeginPlay()
+
+이 함수를 뜯어서 확인해보면 엔진 코어단 기능을 포함하고 있기 때문에, 클래스에 이런 함수를 구현할 때 Super::를 사용하지 않으면 엔진 에러가 난다.
+
+그러니 꼭 Super::가 있는지 확인하고 안에 꼭 넣어주어야한다.
