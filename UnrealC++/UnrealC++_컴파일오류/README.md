@@ -42,14 +42,14 @@ PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
 
 ```
 
-이런 식으로 헤더가 생성되면 무조건 오류가 난다.
+이런 식으로 헤더&.cpp가 생성되면 무조건 오류가 난다.
 
 해결 방법은 여러가지가 있다.
 
 ```
 #include "BaseActor.h"
 ```
-1. 같은 폴더면 하위 폴더 경로를 지운다.
+1. 같은 폴더면 .cpp의 include의 하위 폴더 경로를 지운다.
 
 ```
 #include "../CoreSystem/BaseActor.h"
@@ -75,24 +75,21 @@ struct FGrid
 
 public:
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Grid")
-	int32 X;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Grid")
-	int32 Y;
-
 	FGrid();
-	FGrid(int32 _X, int32 _Y);
+
+	//이거 구현 필요.
 	bool operator==(const FGrid& Other) const;
 };
 
+//이거 구현 필요. 2
 uint32 GetTypeHash(const FGrid& Grid)
 {
 	return FCrc::MemCrc32(&Grid, sizeof(Grid));
 }
 
 ```
-근데, 이 구조체로 TMap, TSet에 사용한 내역이 프로젝트에 존재하지 않으면 오류가 난다.
-그러니 만약 이 기능을 사용할 것이라면 꼭 사용해야한다.
+근데, 이 구조체로 TMap, TSet에 사용한 내역이 프로젝트에 존재하지 않으면 오류가 난다. //이유는 모른다. 다른 컴퓨터에선 문제가 없을지도 모르지만 확인 못해봄.  
+그러니 만약 이 둘을 구현해놨다면 꼭 사용해야한다.
 
 ### Super::
 
