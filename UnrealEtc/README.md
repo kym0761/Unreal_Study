@@ -147,6 +147,11 @@ HUD
 Level  
 Actor in Level  
 
+### 명령어
+
+"~"눌러서 입력하면 된다.
+
+DisplayAll PlayerController ControlRotation - 플레이어 컨트롤러의 회전값을 볼 수 있다.
 
 ### 기타
 

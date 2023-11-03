@@ -9,6 +9,55 @@ https://nightails.com/2022/10/16/unreal-engine-enhanced-input-system-in-c/
 
 어차피 비슷한 내용일 것이므로, 이를 참고하여 C++로 작성해도 괜찮을지도?
 
+## InputSystem
+
+WASD, 마우스 클릭 등의 Input에 대한 행동을 정의할 수 있다.
+
+## Input Processing Procedure
+
+https://docs.unrealengine.com/5.3/ko/input-overview-in-unreal-engine/
+
+Hardware Input from Player
+
+Player Input Mapping
+
+-> InputComponent Checks
+
+1. Input Enabled Actor (Most recent First)
+
+2. Player Controller
+
+3. Level Blueprint
+
+4. Pawn
+
+-> GameLogic
+
+
+이런 순서로 Input 처리가 진행된다.
+
+Pawn마다 움직임이 다르고, Pawn 빙의를 이곳저곳 바뀌는 게임이면 움직임 로직을 Pawn에서 구현하는 것이 좋다. (자동차 <->  사람)
+
+빙의와 상관없는 Input은 Player Controller 등에서 구현하는 것이 좋다(인벤토리 Open Close)
+
+## Enhanced Input
+
+과거 버전의 Input System은 캐릭터 내에 게임로직으로서 Input 자체를 구현하는 방식이라 추후에 입력 설정 변경에 유연하게 대처하기 힘들었다.
+
+그래서 그런 부분을 보완하기 위해 만든 시스템이다.
+
+### 절차 
+
+사용자 입력 -> 입력 매핑 컨텍스트 -> 액션 (Modifier , Trigger) -> 게임 로직(함수)
+
+입력 매핑 컨텍스트 - 플랫폼에 따른 다양한 입력 장치 설정 가능
+
+액션
+
+1. Modifier - 입력값 가공 및 변조
+
+2. trigger - 이벤트 활성화 조건
+
 ### Input Action
 
 Input에 대한 어떠한 행동을 정할 수 있음.
