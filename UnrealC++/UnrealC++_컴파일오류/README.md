@@ -82,14 +82,12 @@ public:
 };
 
 //이거 구현 필요. 2
-uint32 GetTypeHash(const FGrid& Grid)
+FORCEINLINE uint32 GetTypeHash(const FGrid& Grid)
 {
 	return FCrc::MemCrc32(&Grid, sizeof(Grid));
 }
 
 ```
-근데, 이 구조체로 TMap, TSet에 사용한 내역이 프로젝트에 존재하지 않으면 오류가 난다. //이유는 모른다. 다른 컴퓨터에선 문제가 없을지도 모르지만 확인 못해봄.  
-그러니 만약 이 둘을 구현해놨다면 꼭 사용해야한다.
 
 ### Super::
 
