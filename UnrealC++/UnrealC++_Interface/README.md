@@ -37,13 +37,16 @@ public:
 
 인터페이스로 형변환을 했다면, 인터페이스 구현 유무를 파악할 수 있음
 
-///이 방법 쓰면 안됨. 5.X? 버전 부터는 Deprecated됨.  
-~~IInteractive* interactive = Cast<IInteractive>(pawn);  
+```  
+IInteractive* interactive = Cast<IInteractive>(pawn);  
 if(interactive)  
 {  
 interactive->interact(aaa);  
-}~~  
+}  
+```
 
+다만, 위에 있는 인터페이스는 UFUNCTION이 아닐 때만 사용 가능한 방식이다.
+아래의 코드는 UFUNCTION이 있어도 사용가능한 방법이다.
 
 ```
 TObjectPtr<AActor> hitActor = result.GetActor();
