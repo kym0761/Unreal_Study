@@ -1,15 +1,13 @@
 # Unreal_Study/UnrealNetwork
 
-언리얼의 네트워크 프로그래밍은 클라이언트 - 서버 구조이다.
-
-언리얼은 Replicate를 사용해서 서버와 클라가 데이터나 명령 등을 주고받는다.
+언리얼의 네트워크 프로그래밍은 클라이언트 - 서버 구조이다.   
+언리얼은 Replication을 사용해서 서버와 클라가 데이터나 명령 등을 주고받는다.   
 
 
 Replication과 RPC가 정확하게 동작하기 위해서는
 
-1. Actor에서 호출되어야함
-
-2. Actor가 bReplicates = true 여야함
+1. Actor에서 호출되어야함   
+2. Actor가 bReplicates = true 여야함   
 
 ### Replication
 
@@ -17,23 +15,59 @@ Replication과 RPC가 정확하게 동작하기 위해서는
 
 1. Actor의 bReplicates = true;
 
-2. UPROPERTY(replicated)함
+2. UPROPERTY(replicated)
 
 ```
 UPROPERTY(relicated)
 int32 abc;
 ```
 
-3. void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const; 구현해야함
+3. void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const; 구현
 
 ```
 void ASomeActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 
-  DOREPLIFETIME(ASomeActor, abc);
+  DOREPLIFETIME(ASomeActor, abc); //#include "Net/UnrealNetwork.h"
 
 }
 ```
+
+### ReplicatedUsing
+
+실시간으로 값을 계속 갱신하는 방식인 위의 방식보다는, ReplicatedUsing을 사용해 값이 변경됐을 때만 갱신하는 방식이 더 효율적이다.
+
+1. UPROPERTY(ReplicatedUsing = 함수이름)
+```
+UPROPERTY(ReplicatedUsing = OnRep_Func)
+int32 abc;
+```
+
+2. OnRep_함수 구현
+
+```
+UFUNCTION()
+void OnRep_Func();
+```
+
+언리얼 엔진 내에서 abc의 값이 변경되면 OnRep이 호출될 것이다.
+OnRep은 명시적 호출도 가능하다.
+OnRep은 서버가 아닌 클라이언트에서만 호출되는 점을 알아둬야한다.
+
+#### 네트워크에서의 C++ vs 블루프린트
+
+C++에서는 ReplicatedUsing, 블루프린트에서는 RepNotify가 있다.
+
+C++은 클라이언트에서만 호출된다.
+명시적 호출이 가능하다.
+값이 변경될 때만 호출이 된다.
+
+블루프린트는 서버, 클라이언트 각각 호출된다.
+명시적 호출이 불가능하게 막혀있다.
+서버에서는 값이 변경되지 않았어도 계속 호출된다.
+클라이언트는 값이 변경되었을 때만 호출된다.
+
+
 ### RPC (Remote Procedure Call)
 
 UFUNCTION()에 Server, Client, NetMulticast 등의 Specifier를 넣어주면 RPC가 된다.
@@ -129,3 +163,4 @@ IsLocallyControlled()
 GetLocalRole()
 
 GetRemoteRole()
+
