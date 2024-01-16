@@ -27,7 +27,7 @@ PrivateDependencyModuleNames.AddRange(new string[] {  });
 PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
 ```
 
-### 폴더를 나누면 생기는 오류
+### 폴더를 나누어 클래스를 관리하면 생기는 오류
 
 프로젝트 Source 폴더 안에 클래스를 다른 하위 폴더로 나뉘어 관리하면 오류가 남.
 
@@ -46,22 +46,23 @@ PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
 
 해결 방법은 여러가지가 있다.
 
-```
-#include "BaseActor.h"
-```
 1. 같은 폴더면 .cpp의 include의 하위 폴더 경로를 지운다.
+```
+#include "BaseActor.h"(추천1)
+```
 
+2. ../를 사용한다. (개인적으로는 비추천. 지저분하게 보일 수 있음..)
 ```
 #include "../CoreSystem/BaseActor.h"
 ```
-2. ../를 사용한다. (개인적으로는 매우 비추천)
 
-
+3. Build.cs 파일에 위 내용처럼 프로젝트 경로를 연결해준다.(매우 추천)
 ```
-       PrivateIncludePaths.AddRange(new string[] { "{MyProjectName}" });
+       PrivateIncludePaths.AddRange(new string[] { "{MyProjectName}" }); //본인의 프로젝트 Source 안의 기본 프로젝트 폴더를 모듈이라 가정하고 추가한다.
 ```
 
-3. Build.cs 파일에 위 내용처럼 프로젝트 경로를 연결해준다.
+만약 Source 폴더 안에 또다른 폴더를 만들어 소스코드를 관리하고 있다면, 이와 같은 방법으로 Path를 등록해주면 될 것 같다.
+
 
 ### 구조체를 TMap, TSet에서 사용할 때 오류
 
