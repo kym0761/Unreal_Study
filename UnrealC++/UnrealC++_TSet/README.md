@@ -37,10 +37,7 @@ public:
 };
 
 //To Use in TSet Or TMap. You Need To Make operator==, GetTypeHash(). 
-uint32 GetTypeHash(const FGrid& Grid)
-{
-	return FCrc::MemCrc32(&Grid, sizeof(Grid));
-}
+uint32 GetTypeHash(const FGrid& Grid);
 
 ```
 
